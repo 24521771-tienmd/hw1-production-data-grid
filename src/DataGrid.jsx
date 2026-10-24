@@ -1,6 +1,40 @@
 
+import { useState } from 'react'
+
 function DataGrid({ columns, rows, pageSize }) {
-  const visibleRows = rows.slice(0, pageSize)
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: 'ascending',
+  })
+
+  const handleSort = (column) => {
+    if (!column.sortable) return
+
+    setSortConfig((current) => ({
+      key: column.key,
+      direction:
+        current.key === column.key && current.direction === 'ascending'
+          ? 'descending'
+          : 'ascending',
+    }))
+  }
+
+  const sortedRows = [...rows].sort((a, b) => {
+    if (!sortConfig.key) return 0
+
+    const firstValue = a[sortConfig.key]
+    const secondValue = b[sortConfig.key]
+
+    const comparison = String(firstValue ?? '').localeCompare(
+      String(secondValue ?? ''),
+      undefined,
+      { numeric: true, sensitivity: 'base' },
+    )
+
+    return sortConfig.direction === 'ascending' ? comparison : -comparison
+  })
+
+  const visibleRows = sortedRows.slice(0, pageSize)
 
   return (
     <div className="table-wrapper">
@@ -11,11 +45,38 @@ function DataGrid({ columns, rows, pageSize }) {
 
         <thead>
           <tr>
-            {columns.map((column) => (
-              <th key={column.key} scope="col">
-                {column.header}
-              </th>
-            ))}
+            {columns.map((column) => {
+              const isSorted = sortConfig.key === column.key
+
+              return (
+                <th
+                  key={column.key}
+                  scope="col"
+                  aria-sort={
+                    isSorted ? sortConfig.direction : 'none'
+                  }
+                >
+                  {column.sortable ? (
+                    <button
+                      type="button"
+                      className="sort-button"
+                      onClick={() => handleSort(column)}
+                    >
+                      {column.header}
+                      <span aria-hidden="true">
+                        {isSorted
+                          ? sortConfig.direction === 'ascending'
+                            ? ' ▲'
+                            : ' ▼'
+                          : ' ↕'}
+                      </span>
+                    </button>
+                  ) : (
+                    column.header
+                  )}
+                </th>
+              )
+            })}
           </tr>
         </thead>
 
@@ -26,7 +87,9 @@ function DataGrid({ columns, rows, pageSize }) {
                 {columns.map((column) => (
                   <td
                     key={column.key}
-                    className={column.key === 'name' ? 'employee-name' : undefined}
+                    className={
+                      column.key === 'name' ? 'employee-name' : undefined
+                    }
                   >
                     {column.key === 'status' ? (
                       <span
@@ -45,7 +108,9 @@ function DataGrid({ columns, rows, pageSize }) {
             ))
           ) : (
             <tr>
-              <td colSpan={columns.length}>No employee records available.</td>
+              <td colSpan={columns.length}>
+                No employee records available.
+              </td>
             </tr>
           )}
         </tbody>
