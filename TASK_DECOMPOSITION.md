@@ -54,6 +54,21 @@ Build an accessible, production-oriented Data-Grid with sorting, filtering, and 
 - T12: Audit accessibility and Lighthouse results.
 - T13: Document verification results and known limitations.
 
+#### T12 — Accessibility Audit Results
+
+- Lighthouse Accessibility score: **100/100**.
+- Lighthouse Best Practices score: **100/100**.
+- Manual keyboard testing: **Passed**, based on testing of Tab and Shift+Tab navigation, visible focus indicators, search input, sortable column controls, and pagination controls.
+- Automated Lighthouse checks do not establish complete WCAG 2.2 AA conformance. Further manual review may still be required.
+
+#### T13 — Verification Notes and Known Limitations
+
+- Sorting, filtering, and pagination were tested during implementation.
+- Keyboard interaction was manually checked and reported to work as expected.
+- Lighthouse results were recorded from the local development application at `http://localhost:5173/`.
+- The recorded Lighthouse scores represent the tested run and may vary with later changes or test conditions.
+- Full WCAG 2.2 AA conformance has not been independently established by these checks alone.
+
 ## 5. Acceptance Criteria
 
 - Sorting produces the expected record order.
