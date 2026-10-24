@@ -1,5 +1,6 @@
 
 import DataGrid from './DataGrid'
+import { employeeColumns, employees } from './data/employees'
 import './App.css'
 
 function App() {
@@ -23,10 +24,14 @@ function App() {
               Employee records and current employment status.
             </p>
           </div>
-          <span className="record-count">5 employees</span>
+          <span className="record-count">{employees.length} employees</span>
         </div>
 
-        <DataGrid />
+        <DataGrid
+          columns={employeeColumns}
+          rows={employees}
+          pageSize={10}
+        />
       </section>
     </main>
   )
