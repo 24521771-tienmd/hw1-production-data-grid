@@ -7,6 +7,7 @@ function DataGrid({ columns, rows, pageSize }) {
     direction: 'ascending',
   })
   const [filterQuery, setFilterQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
 
   const handleSort = (column) => {
     if (!column.sortable) return
@@ -45,7 +46,32 @@ function DataGrid({ columns, rows, pageSize }) {
     return sortConfig.direction === 'ascending' ? comparison : -comparison
   })
 
-  const visibleRows = sortedRows.slice(0, pageSize)
+  const safePageSize =
+    Number.isInteger(pageSize) && pageSize > 0 ? pageSize : 10
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(sortedRows.length / safePageSize),
+  )
+
+  const effectivePage = Math.min(currentPage, totalPages)
+
+  const startIndex = (effectivePage - 1) * safePageSize
+  const visibleRows = sortedRows.slice(
+    startIndex,
+    startIndex + safePageSize,
+  )
+
+  const handleFilterChange = (event) => {
+    setFilterQuery(event.target.value)
+    setCurrentPage(1)
+  }
+
+  const firstVisibleRow = sortedRows.length === 0 ? 0 : startIndex + 1
+  const lastVisibleRow = Math.min(
+    startIndex + visibleRows.length,
+    sortedRows.length,
+  )
 
   return (
     <div className="table-wrapper">
@@ -55,7 +81,7 @@ function DataGrid({ columns, rows, pageSize }) {
           id="employee-filter"
           type="search"
           value={filterQuery}
-          onChange={(event) => setFilterQuery(event.target.value)}
+          onChange={handleFilterChange}
           placeholder="Search by name, email, department..."
         />
         <p className="filter-result-count" aria-live="polite">
@@ -141,6 +167,35 @@ function DataGrid({ columns, rows, pageSize }) {
           )}
         </tbody>
       </table>
+
+      <div className="pagination" aria-label="Employee table pagination">
+        <p className="pagination-summary" aria-live="polite">
+          Showing {firstVisibleRow}–{lastVisibleRow} of {sortedRows.length}
+          {' '}employees
+        </p>
+
+        <div className="pagination-controls">
+          <button
+            type="button"
+            onClick={() => setCurrentPage(Math.max(1, effectivePage - 1))}
+            disabled={effectivePage <= 1}
+          >
+            Previous
+          </button>
+
+          <span aria-current="page">
+            Page {Math.min(effectivePage, totalPages)} of {totalPages}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => setCurrentPage(Math.min(totalPages, effectivePage + 1))}
+            disabled={effectivePage >= totalPages}
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
