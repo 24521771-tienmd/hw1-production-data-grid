@@ -6,6 +6,7 @@ function DataGrid({ columns, rows, pageSize }) {
     key: null,
     direction: 'ascending',
   })
+  const [filterQuery, setFilterQuery] = useState('')
 
   const handleSort = (column) => {
     if (!column.sortable) return
@@ -19,7 +20,17 @@ function DataGrid({ columns, rows, pageSize }) {
     }))
   }
 
-  const sortedRows = [...rows].sort((a, b) => {
+  const normalizedQuery = filterQuery.trim().toLowerCase()
+
+  const filteredRows = rows.filter((row) =>
+    columns.some((column) =>
+      String(row[column.key] ?? '')
+        .toLowerCase()
+        .includes(normalizedQuery),
+    ),
+  )
+
+  const sortedRows = [...filteredRows].sort((a, b) => {
     if (!sortConfig.key) return 0
 
     const firstValue = a[sortConfig.key]
@@ -38,6 +49,21 @@ function DataGrid({ columns, rows, pageSize }) {
 
   return (
     <div className="table-wrapper">
+      <div className="data-grid-toolbar">
+        <label htmlFor="employee-filter">Search employees</label>
+        <input
+          id="employee-filter"
+          type="search"
+          value={filterQuery}
+          onChange={(event) => setFilterQuery(event.target.value)}
+          placeholder="Search by name, email, department..."
+        />
+        <p className="filter-result-count" aria-live="polite">
+          {filteredRows.length} matching employee
+          {filteredRows.length === 1 ? '' : 's'}
+        </p>
+      </div>
+
       <table className="data-grid">
         <caption className="visually-hidden">
           Employee directory with employee details and employment status
@@ -52,9 +78,7 @@ function DataGrid({ columns, rows, pageSize }) {
                 <th
                   key={column.key}
                   scope="col"
-                  aria-sort={
-                    isSorted ? sortConfig.direction : 'none'
-                  }
+                  aria-sort={isSorted ? sortConfig.direction : 'none'}
                 >
                   {column.sortable ? (
                     <button
@@ -109,7 +133,9 @@ function DataGrid({ columns, rows, pageSize }) {
           ) : (
             <tr>
               <td colSpan={columns.length}>
-                No employee records available.
+                {rows.length === 0
+                  ? 'No employee records available.'
+                  : 'No employees match your search.'}
               </td>
             </tr>
           )}

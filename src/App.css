@@ -1,25 +1,44 @@
 
-.sort-button {
-  display: inline-flex;
+.data-grid-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(12rem, 24rem);
   align-items: center;
-  gap: 0.35rem;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.data-grid-toolbar label {
+  font-weight: 600;
+}
+
+.data-grid-toolbar input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #64748b;
+  border-radius: 0.375rem;
+  background: #fff;
+  color: #1e293b;
   font: inherit;
-  font-weight: inherit;
-  text-align: left;
-  cursor: pointer;
 }
 
-.sort-button:focus-visible {
+.data-grid-toolbar input:focus-visible {
   outline: 3px solid #2563eb;
-  outline-offset: 4px;
-  border-radius: 2px;
+  outline-offset: 3px;
 }
 
-.sort-button:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+.filter-result-count {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 36rem) {
+  .data-grid-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-result-count {
+    grid-column: auto;
+  }
 }
